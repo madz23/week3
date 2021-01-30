@@ -7,6 +7,15 @@ public class Course {
     private String name;
     private int credits;
 
+    public Course() {}
+
+    public Course(String department, int crn, String name, int credits) {
+        this.department = department;
+        this.crn = crn;
+        this.name = name;
+        this.credits = credits;
+    }
+
     public String getDepartment() {
         return department;
     }

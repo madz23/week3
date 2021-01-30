@@ -9,11 +9,24 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Button;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
+
 
 public class App extends Application {
+
+    private static final String DATA = "./data.json";
+    private List<Course> courses;
+    private IOManager manager;
+
+    public App() {
+
+    }
     @Override
     public void start(Stage box) throws Exception {
         box.setTitle("Course Generator");
@@ -40,8 +53,29 @@ public class App extends Application {
         TextField nameEntry = new TextField();
         TextField creditEntry = new TextField();
 
+        //This button will save and enter everything that has been entered
+        Button enterbutton = new Button("Generate Course");
+
+        //Here is enterbutton's event handler
+        enterbutton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent generateCourse) {
+                try {
+                    //Here we need to store the new course
+                    Course generatedCourse = new Course();
+                } catch (Exception badEntry) {
+                    System.out.println("Nope.");
+                }
+            }
+        });
+
+
+
+
+
         //Okay this vbox should hold all of the buttons for entering the data
-        VBox button_holder = new VBox(departmentLabel, dropdown, crnLabel,crnEntry, nameLabel,nameEntry, creditLabel,creditEntry);
+        VBox button_holder = new VBox(departmentLabel, dropdown, crnLabel,crnEntry, nameLabel,nameEntry,
+                creditLabel,creditEntry, enterbutton);
 
         //This is the final box. We will only put button_holder in here for now, but we will probably add more later.
         HBox big_box = new HBox(button_holder);
@@ -51,6 +85,10 @@ public class App extends Application {
         box.setScene(biggest_box);
 
         box.show();
+    }
+
+    private void loadCourse() {
+        manager.readData(DATA);
     }
 
     public static void main(String[] args) {Application.launch(args);} //launches the boc
