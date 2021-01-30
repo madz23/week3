@@ -3,6 +3,7 @@
  */
 package week3;
 
+import com.google.gson.Gson;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -15,21 +16,19 @@ import javafx.event.EventHandler;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import java.util.List;
+import java.util.Vector;
 
 
 public class App extends Application {
 
-    private static final String DATA = "./data.json";
-    private List<Course> courses;
-    private IOManager manager;
+
 
     public App() {
 
     }
     @Override
-    public void start(Stage box) throws Exception {
-        box.setTitle("Course Generator");
+    public void start(Stage stage) throws Exception {
+        stage.setTitle("Course Generator");
 
         //Labels for all the entry fields
         Label departmentLabel = new Label("Department");
@@ -53,6 +52,11 @@ public class App extends Application {
         TextField nameEntry = new TextField();
         TextField creditEntry = new TextField();
 
+        //This is a little HBox that will only display anything if there is an error
+        HBox error_box = new HBox();
+
+        //This is the vector object where we will store the courses
+        Vector<Course> courseVector = new Vector<Course>(50);
         //This button will save and enter everything that has been entered
         Button enterbutton = new Button("Generate Course");
 
@@ -61,35 +65,63 @@ public class App extends Application {
             @Override
             public void handle(ActionEvent generateCourse) {
                 try {
-                    //Here we need to store the new course
-                    Course generatedCourse = new Course();
+                    //variables to be stored
+                    String obj_department = (String) dropdown.getValue();
+                    int obj_crn = Integer.parseInt(crnEntry.getText());
+                    String obj_name = nameEntry.getText();
+                    int obj_credit = Integer.parseInt(creditEntry.getText());
+
+                    Course generatedCourse = new Course(obj_department, obj_crn, obj_name, obj_credit);
+                    courseVector.add(generatedCourse);
+
                 } catch (Exception badEntry) {
-                    System.out.println("Nope.");
+                    error_box.getChildren().clear();
+                    Label errorLabel = new Label("Cannot generate a course with this data.");
+                    error_box.getChildren().add(errorLabel);
                 }
             }
         });
+
+        //This display button goes to the right of the course maker fields and displays the courses in the vector
+        Button displayallbutton = new Button("Display Courses");
+        //VBox to put the new courses in
+        VBox courseList = new VBox();
+        //eventhandler to display the vecctor
+        displayallbutton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                courseList.getChildren().clear();
+                for (Course courses: courseVector) {
+                    Label courseLabel = new Label(courses.toString());
+                    courseList.getChildren().add(courseLabel);
+                }
+            }
+    });
 
 
 
 
 
         //Okay this vbox should hold all of the buttons for entering the data
+        //Any errors will be displayed beneath this box
         VBox button_holder = new VBox(departmentLabel, dropdown, crnLabel,crnEntry, nameLabel,nameEntry,
-                creditLabel,creditEntry, enterbutton);
+                creditLabel,creditEntry, enterbutton, error_box);
+
+
+        //This vbox is where we will display the generated courses
+        VBox course_box = new VBox(displayallbutton, courseList);
 
         //This is the final box. We will only put button_holder in here for now, but we will probably add more later.
-        HBox big_box = new HBox(button_holder);
+        HBox big_box = new HBox(button_holder, course_box);
 
         //Here is the final scene. Only big_box should be put in here with the dimensions.
         Scene biggest_box = new Scene(big_box, 500, 500);
-        box.setScene(biggest_box);
+        stage.setScene(biggest_box);
 
-        box.show();
+        stage.show();
     }
 
-    private void loadCourse() {
-        manager.readData(DATA);
-    }
+
 
     public static void main(String[] args) {Application.launch(args);} //launches the boc
 }
