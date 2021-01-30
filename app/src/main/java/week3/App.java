@@ -3,12 +3,55 @@
  */
 package week3;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
+import javafx.application.Application;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
+
+public class App extends Application {
+    @Override
+    public void start(Stage box) throws Exception {
+        box.setTitle("Course Generator");
+
+        //Labels for all the entry fields
+        Label departmentLabel = new Label("Department");
+        Label crnLabel = new Label("Course Number");
+        Label nameLabel = new Label("Course Name");
+        Label creditLabel = new Label("Number of credits");
+
+        //ChoiceBox (drop-down menu)
+        ChoiceBox dropdown = new ChoiceBox();
+        //Here are the options for the drop-down menu
+        //CS CHEM PHYS MATH BTNY ZOO
+        dropdown.getItems().add("CS");
+        dropdown.getItems().add("CHEM");
+        dropdown.getItems().add("PHYS");
+        dropdown.getItems().add("MATH");
+        dropdown.getItems().add("BTNY");
+        dropdown.getItems().add("ZOO");
+
+        //Text fields for the other instance variables in course: crn, name, and credit
+        TextField crnEntry = new TextField();
+        TextField nameEntry = new TextField();
+        TextField creditEntry = new TextField();
+
+        //Okay this vbox should hold all of the buttons for entering the data
+        VBox button_holder = new VBox(departmentLabel, dropdown, crnLabel,crnEntry, nameLabel,nameEntry, creditLabel,creditEntry);
+
+        //This is the final box. We will only put button_holder in here for now, but we will probably add more later.
+        HBox big_box = new HBox(button_holder);
+
+        //Here is the final scene. Only big_box should be put in here with the dimensions.
+        Scene biggest_box = new Scene(big_box, 500, 500);
+        box.setScene(biggest_box);
+
+        box.show();
     }
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
-    }
+    public static void main(String[] args) {Application.launch(args);} //launches the boc
 }
