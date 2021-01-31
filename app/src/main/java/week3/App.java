@@ -3,12 +3,142 @@
  */
 package week3;
 
-public class App {
-    public String getGreeting() {
-        return "Hello World!";
+import javafx.application.Application;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
+import java.util.Vector;
+
+
+public class App extends Application {
+
+
+
+    public App() {
+
+    }
+    @Override
+    public void start(Stage stage) throws Exception {
+        stage.setTitle("Course Generator");
+
+        //Labels for all the entry fields
+        Label departmentLabel = new Label("Department");
+        Label crnLabel = new Label("Course Number");
+        Label nameLabel = new Label("Course Name");
+        Label creditLabel = new Label("Number of credits");
+
+        //We need to make a course we don't actually use to get the arrays stored there
+        Course sample = new Course();
+
+        //ChoiceBox (drop-down menu)
+        ChoiceBox dropdown;
+        dropdown = new ChoiceBox();
+        //Here we will add the options for the drop-down menu from sample's list
+        for (String values: sample.getDepartmentList()) {dropdown.getItems().add(values);}
+
+        //Text fields for the other instance variables in course: crn, name, and credit
+        TextField crnEntry = new TextField();
+        TextField nameEntry = new TextField();
+        TextField creditEntry = new TextField();
+
+        //This is a little HBox that will only display anything if there is an error
+        HBox error_box = new HBox();
+
+        //This is the vector object where we will store the courses
+        Vector<Course> courseVector = new Vector<Course>(50);
+        //This button will save and enter everything that has been entered
+        Button enterbutton = new Button("Generate Course");
+
+        //Here is enterbutton's event handler
+        enterbutton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent generateCourse) {
+                try {
+                    //variables to be stored
+                    String obj_department = (String) dropdown.getValue();
+                    int obj_crn = Integer.parseInt(crnEntry.getText());
+                    String obj_name = nameEntry.getText();
+                    int obj_credit = Integer.parseInt(creditEntry.getText());
+
+                    Course generatedCourse = new Course(obj_department, obj_crn, obj_name, obj_credit);
+                    generatedCourse.convertDepartmentToCode();
+                    courseVector.add(generatedCourse);
+
+                } catch (Exception badEntry) {
+                    error_box.getChildren().clear();
+                    Label errorLabel = new Label("Cannot generate a course \nwith this data.");
+                    error_box.getChildren().add(errorLabel);
+                }
+            }
+        });
+
+        //This display button goes to the right of the course maker fields and displays the courses in the vector
+        Button displayallbutton = new Button("Display All Courses");
+        //VBox to put the new courses in
+        VBox courseList = new VBox();
+        //eventhandler to display the vecctor
+        displayallbutton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                courseList.getChildren().clear();
+                for (Course courses: courseVector) {
+                    Label courseLabel = new Label(courses.toString());
+                    courseList.getChildren().add(courseLabel);
+                }
+            }
+    });
+
+        //Here are the buttons that display by department
+        ChoiceBox display_by_department = new ChoiceBox();
+        for (String values: sample.getDepartmentCodes()) {display_by_department.getItems().add(values);}
+
+        Button enterdepartment = new Button("Display By Department");
+        enterdepartment.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                courseList.getChildren().clear();
+                for (Course course: courseVector) {
+                    if (course.getDepartment() == display_by_department.getValue()) {
+                        Label courseLabel = new Label(course.toString());
+                        courseList.getChildren().add(courseLabel);
+                    }
+                }
+            }
+        });
+
+        //Here we will keep the box with the scroll bar
+        ScrollPane scroll_box = new ScrollPane();
+        scroll_box.setContent(courseList);
+        scroll_box.setPrefSize(250, 350);
+        scroll_box.vbarPolicyProperty().setValue(ScrollPane.ScrollBarPolicy.ALWAYS);
+
+
+        //Okay this vbox should hold all of the buttons for entering the data
+        //Any errors will be displayed beneath this box
+        VBox button_holder = new VBox(10,departmentLabel, dropdown, crnLabel,crnEntry, nameLabel,nameEntry,
+                creditLabel,creditEntry, enterbutton, error_box);
+
+        HBox department_picker_box = new HBox(enterdepartment, display_by_department);
+
+        //This vbox is where we will display the generated courses
+        VBox course_box = new VBox(displayallbutton, department_picker_box,scroll_box);
+
+        //This is the final box. We will only put button_holder in here for now, but we will probably add more later.
+        HBox big_box = new HBox(32, button_holder, course_box);
+
+        //Here is the final scene. Only big_box should be put in here with the dimensions.
+        Scene biggest_box = new Scene(big_box, 500, 500);
+        stage.setScene(biggest_box);
+
+        stage.show();
     }
 
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
-    }
+
+
+    public static void main(String[] args) {Application.launch(args);} //launches the boc
 }
